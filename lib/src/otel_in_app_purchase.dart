@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_in_app_purchase_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_in_app_purchase';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class InAppPurchaseResult {
+  /// Creates a result.
   const InAppPurchaseResult({
     this.store,
     this.productId,
@@ -91,8 +92,13 @@ class InAppPurchaseResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class InAppPurchaseCallResult<T> {
+  /// Creates a call result.
   const InAppPurchaseCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final InAppPurchaseResult? result;
 }
@@ -120,50 +126,50 @@ Future<T> tracedInAppPurchase<T>({
   final span = _tracer().startSpan(
     'in_app_purchase $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.store != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.store',
           r.result!.store!,
         ));
       }
       if (r.result!.productId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.product.id',
           r.result!.productId!,
         ));
       }
       if (r.result!.productType != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.product.type',
           r.result!.productType!,
         ));
       }
       if (r.result!.purchaseId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.purchase.id',
           r.result!.purchaseId!,
         ));
       }
       if (r.result!.transactionId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.transaction.id',
           r.result!.transactionId!,
         ));
       }
       if (r.result!.originalTransactionId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.transaction.original_id',
           r.result!.originalTransactionId!,
         ));
       }
       if (r.result!.purchaseStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.purchase.status',
           r.result!.purchaseStatus!,
         ));
@@ -172,37 +178,37 @@ Future<T> tracedInAppPurchase<T>({
         }
       }
       if (r.result!.priceMinor != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'in_app_purchase.price.minor',
           r.result!.priceMinor!,
         ));
       }
       if (r.result!.currencyCode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.currency.code',
           r.result!.currencyCode!,
         ));
       }
       if (r.result!.offerType != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.offer.type',
           r.result!.offerType!,
         ));
       }
       if (r.result!.introductoryOffer != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'in_app_purchase.offer.introductory',
           r.result!.introductoryOffer!,
         ));
       }
       if (r.result!.acknowledged != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'in_app_purchase.acknowledged',
           r.result!.acknowledged!,
         ));
       }
       if (r.result!.serverVerified != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'in_app_purchase.server.verified',
           r.result!.serverVerified!,
         ));
@@ -214,25 +220,25 @@ Future<T> tracedInAppPurchase<T>({
         }
       }
       if (r.result!.serverErrorCode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.server.error_code',
           r.result!.serverErrorCode!,
         ));
       }
       if (r.result!.errorCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'in_app_purchase.error.code',
           r.result!.errorCode!,
         ));
       }
       if (r.result!.errorMessage != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'in_app_purchase.error.message',
           r.result!.errorMessage!,
         ));
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -243,13 +249,13 @@ Future<T> tracedInAppPurchase<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
