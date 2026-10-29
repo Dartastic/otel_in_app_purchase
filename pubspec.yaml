@@ -3,7 +3,7 @@ description: >-
   OpenTelemetry instrumentation for in_app_purchase by Dartastic.io. Adds
   standard OpenTelemetry observability to applications that use
   in_app_purchase.
-version: 0.1.0-wip
+version: 0.1.0
 repository: https://github.com/dartastic/otel_in_app_purchase
 homepage: https://dartastic.io
 
